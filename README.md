@@ -143,31 +143,6 @@ Run `make bench` for numbers on your hardware.
 
 ---
 
-## Known Gaps
-
-These are intentional omissions, not oversights. Each is a real production design decision:
-
-- **Self-trade prevention (STP):** Exchange policy, not always enforced at engine level. Production engines tag orders with firm/trader IDs and reject crosses within the same firm.
-- **FOK liquidity check:** Current implementation is optimistic. A production FOK must walk all crossing levels and sum available qty read-only before touching the book.
-- **WAL group commit:** Current implementation syncs per-record. Production uses group commit — batch N records, one `fdatasync` — trading durability granularity for throughput.
-- **Order amendment:** Not implemented. Production engines support price/qty modification: cancel + reinsert loses time priority; in-place qty reduction preserves it.
-- **Array-based book:** For production HFT, price level container would be a sorted array or skip list for cache-friendly sequential access. `std::map` is correct and sufficient here.
-
----
-
-## Interview Talking Points
-
-1. **Why not `double` for price?** `0.1 + 0.2 != 0.3` in IEEE 754. Exact integer ticks required for order matching — one rounding error in a fill = compliance violation.
-2. **Why `std::map` not `unordered_map`?** Need ordering — `begin()`/`rbegin()` gives best price O(1). `unordered_map` is O(n) to find min/max and has unpredictable hash collision latency spikes.
-3. **Why intrusive list?** `std::list` = heap alloc per node = pointer chasing = cache miss per traversal. Intrusive embeds pointers in Order; pool keeps them contiguous in memory.
-4. **Why SPSC not mutex?** Mutex = kernel syscall on contention = microseconds. SPSC = pure userspace acquire-release ring buffer = nanoseconds. No CAS loop needed — single producer, single consumer means no contention by design.
-5. **What is false sharing?** Two threads write to different variables that share a cache line. Each write invalidates the other core's cache line — "cache ping-pong". Fix: `alignas(64)` padding between hot variables.
-6. **What is the ABA problem?** Thread reads ptr X, another thread pops X and pushes new node at same address, first thread's CAS succeeds incorrectly. Fix: tagged pointers or epoch-based reclamation.
-7. **Why WAL before state change?** Crash after state change but before WAL write = lost order with no recovery path. WAL-first = always recoverable by replay.
-8. **Why does throughput vary between runs?** CPU frequency scaling, OS timer interrupts, cold vs warm cache, `std::vector<Trade>` reallocation. P50 latency (~72 ns) is stable. Throughput numbers are order-of-magnitude: read as "10M+ orders/sec", not a precise figure.
-
----
-
 ## What I Built and Why
 
 This project was built as deep preparation for HFT engineering roles. Every decision was made through the lens of: *"why this data structure, why this memory layout, what breaks at 1M orders/sec."*
