@@ -151,6 +151,18 @@ The progression M1 → M8 mirrors how a real trading system is built: correctnes
 
 ---
 
+## Known Gaps
+
+These are intentional omissions, not oversights. Each is a real production design decision:
+
+- **Self-trade prevention (STP):** Exchange policy, not always enforced at engine level. Production engines tag orders with firm/trader IDs and reject crosses within the same firm.
+- **FOK liquidity check:** Current implementation is optimistic. A production FOK must walk all crossing levels and sum available qty read-only before touching the book.
+- **WAL group commit:** Current implementation syncs per-record. Production uses group commit — batch N records, one `fdatasync` — trading durability granularity for throughput.
+- **Order amendment:** Not implemented. Production engines support price/qty modification: cancel + reinsert loses time priority; in-place qty reduction preserves it.
+- **Array-based book:** For production HFT, price level container would be a sorted array or skip list for cache-friendly sequential access. `std::map` is correct and sufficient here.
+
+---
+
 ## Author
 
 **Aditya** — Final year CS (AI), BIT Bhilai  
