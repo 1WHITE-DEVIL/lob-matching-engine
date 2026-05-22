@@ -1,0 +1,19 @@
+# Build directory — all binaries and artifacts go here (see Makefile)
+build/
+
+# WAL test files
+*.wal
+/tmp/*.wal
+
+# Dependency files (if you add -MMD -MP to CXXFLAGS later)
+*.d
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*~
+
+# OS
+.DS_Store
+Thumbs.db
