@@ -143,14 +143,6 @@ Run `make bench` for numbers on your hardware.
 
 ---
 
-## What I Built and Why
-
-This project was built as deep preparation for HFT engineering roles. Every decision was made through the lens of: *"why this data structure, why this memory layout, what breaks at 1M orders/sec."*
-
-The progression M1 → M8 mirrors how a real trading system is built: correctness first, then measurement, then optimization, then persistence. Skipping that order produces fast code that is wrong, or correct code you cannot defend under load.
-
----
-
 ## Known Gaps
 
 These are intentional omissions, not oversights. Each is a real production design decision:
@@ -162,6 +154,16 @@ These are intentional omissions, not oversights. Each is a real production desig
 - **Array-based book:** For production HFT, price level container would be a sorted array or skip list for cache-friendly sequential access. `std::map` is correct and sufficient here.
 
 ---
+
+
+## What I Built and Why
+
+This project was built as deep preparation for HFT engineering roles. Every decision was made through the lens of: *"why this data structure, why this memory layout, what breaks at 1M orders/sec."*
+
+The progression M1 → M8 mirrors how a real trading system is built: correctness first, then measurement, then optimization, then persistence. Skipping that order produces fast code that is wrong, or correct code you cannot defend under load.
+
+---
+
 
 ## Author
 
