@@ -167,5 +167,5 @@ The progression M1 → M8 mirrors how a real trading system is built: correctnes
 
 ## Author
 
-**Aditya** — Final year CS (AI), BIT Bhilai  
+**Aditya Gupta** —  CS (AI), BIT Durg  
 [LinkedIn](https://www.linkedin.com/in/aditya-gupta-74b6b7171) · [GitHub](https://github.com/1WHITE-DEVIL)
